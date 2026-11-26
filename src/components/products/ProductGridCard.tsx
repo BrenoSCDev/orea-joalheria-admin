@@ -1,9 +1,10 @@
 import { Gem, Sparkles, Star, StarHalf } from "lucide-react";
 import { Product, ProductToggle } from "@/types/api";
+import { PriceTag } from "./PriceTag";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductStatusBadge } from "./ProductStatusBadge";
 import { ProductActionsMenu } from "./ProductActionsMenu";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface Props {
   product: Product;
@@ -83,7 +84,7 @@ export const ProductGridCard = ({ product: p, selected, selectionMode, onSelect,
         {p.categories?.[0] && ` · ${p.categories[0].name}`}
       </p>
       <div className="flex items-center justify-between gap-2 pt-1">
-        <span className="truncate text-[13px] tabular-nums">{p.price ? formatPrice(p.price) : <span className="text-muted-foreground">Sob consulta</span>}</span>
+        <PriceTag product={p} className="truncate text-[13px]" />
         <ProductStatusBadge product={p} />
       </div>
     </div>

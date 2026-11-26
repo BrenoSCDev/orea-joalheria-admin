@@ -1,11 +1,11 @@
 import { createPortal } from "react-dom";
-import { ChevronDown, Eye, EyeOff, FolderMinus, FolderPlus, Gem, Layers, Loader2, Package, Star, StarHalf, StarOff, Trash2, X } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, FolderMinus, FolderPlus, Gem, Layers, Loader2, Package, Percent, Star, StarHalf, StarOff, Trash2, X } from "lucide-react";
 import { BulkAction } from "@/services/catalogService";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-export type BulkIntent = BulkAction | "categories_add" | "categories_remove" | "collection" | "stock";
+export type BulkIntent = BulkAction | "categories_add" | "categories_remove" | "collection" | "stock" | "discount";
 
 interface Props {
   count: number;
@@ -44,6 +44,14 @@ export const BulkActionBar = ({ count, busy, onAction, onClear }: Props) => {
       </DropdownMenuItem>
       <DropdownMenuItem onSelect={() => onAction("stock")}>
         <Package className="mr-2 h-4 w-4" /> Definir estoque…
+      </DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço</DropdownMenuLabel>
+      <DropdownMenuItem onSelect={() => onAction("discount")}>
+        <Percent className="mr-2 h-4 w-4" /> Aplicar desconto…
+      </DropdownMenuItem>
+      <DropdownMenuItem onSelect={() => onAction("clear_discount")}>
+        <Percent className="mr-2 h-4 w-4 opacity-50" /> Remover preço promocional
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Página inicial</DropdownMenuLabel>

@@ -67,6 +67,8 @@ export interface Product {
   weight_grams: string | null;
   size: string | null;
   price: string | null;
+  /** Discounted price (lower than `price`); null = no discount. */
+  promotional_price: string | null;
   stock_quantity: number;
   /** One-of-a-kind piece: stock is 1 (available) or 0 (sold). Default true. */
   is_unique: boolean;
@@ -105,6 +107,8 @@ export interface SiteSettings {
   subfeatured_eyebrow: string | null;
   subfeatured_title: string | null;
   spotlight_eyebrow: string | null;
+  /** One message per line; empty = no strip. */
+  announcement_bar: string | null;
 }
 
 /** Quick flags toggled from the product list (menu / grid card). */

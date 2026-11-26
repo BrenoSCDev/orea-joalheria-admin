@@ -21,8 +21,9 @@ import { StockCell } from "@/components/products/StockCell";
 import { ProductActionsMenu } from "@/components/products/ProductActionsMenu";
 import { ProductGridCard, ProductGridCardSkeleton } from "@/components/products/ProductGridCard";
 import { BulkActionBar, BulkIntent } from "@/components/products/BulkActionBar";
-import { BulkCategoriesDialog, BulkCollectionDialog, BulkStockDialog } from "@/components/products/BulkDialogs";
-import { cn, formatPrice } from "@/lib/utils";
+import { BulkCategoriesDialog, BulkCollectionDialog, BulkDiscountDialog, BulkStockDialog } from "@/components/products/BulkDialogs";
+import { PriceTag } from "@/components/products/PriceTag";
+import { cn } from "@/lib/utils";
 import { buildTree, flattenTree } from "@/lib/categoryTree";
 
 const STATUS_TABS: { value: ProductStatusFilter | "all"; label: string }[] = [
@@ -50,6 +51,8 @@ const BULK_DONE: Record<BulkAction, (n: number) => string> = {
   subfeature: (n) => `${pieces(n)} ${n === 1 ? "adicionada" : "adicionadas"} aos subdestaques.`,
   unsubfeature: (n) => `Subdestaque removido de ${pieces(n)}.`,
   set_stock: (n) => `Estoque atualizado em ${pieces(n)}.`,
+  set_discount: (n) => `Desconto aplicado em ${pieces(n)}.`,
+  clear_discount: (n) => `Preço promocional removido de ${pieces(n)}.`,
   mark_unique: (n) => `${pieces(n)} ${n === 1 ? "marcada" : "marcadas"} como peça única.`,
   unmark_unique: (n) => `${pieces(n)} com estoque por quantidade.`,
   add_categories: (n) => `Categorias adicionadas a ${pieces(n)}.`,
@@ -179,7 +182,7 @@ const Products = () => {
   };
 
   /* ── Bulk actions ───────────────────────────────────── */
-  const [dialog, setDialog] = useState<null | "categories_add" | "categories_remove" | "collection" | "stock" | "delete">(null);
+  const [dialog, setDialog] = useState<null | "categories_add" | "categories_remove" | "collection" | "stock" | "discount" | "delete">(null);
 
   const bulk = useMutation({
     mutationFn: (payload: BulkPayload) => {
@@ -198,7 +201,7 @@ const Products = () => {
   });
 
   const onIntent = (intent: BulkIntent) => {
-    if (intent === "categories_add" || intent === "categories_remove" || intent === "collection" || intent === "stock" || intent === "delete") return setDialog(intent);
+    if (intent === "categories_add" || intent === "categories_remove" || intent === "collection" || intent === "stock" || intent === "discount" || intent === "delete") return setDialog(intent);
     bulk.mutate({ action: intent });
   };
 
@@ -411,7 +414,9 @@ const Products = () => {
                         )}
                       </td>
                       <td className="hidden max-w-[160px] truncate px-4 py-2.5 text-muted-foreground 2xl:table-cell">{p.collection?.name ?? "—"}</td>
-                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">{p.price ? formatPrice(p.price) : <span className="text-muted-foreground">Sob consulta</span>}</td>
+                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                        <PriceTag product={p} />
+                      </td>
                       <td className="whitespace-nowrap px-4 py-2.5">
                         <StockCell product={p} onSave={(qty) => stock.mutate({ id: p.id, qty })} />
                       </td>
@@ -451,7 +456,7 @@ const Products = () => {
                     <p className="truncate font-medium">{p.name}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-muted-foreground">
                       <ProductStatusBadge product={p} />
-                      <span className="whitespace-nowrap tabular-nums">{formatPrice(p.price)}</span>
+                      <PriceTag product={p} className="whitespace-nowrap" />
                       <span className="whitespace-nowrap">{p.is_unique ? "Peça única" : `${p.stock_quantity} un.`}</span>
                     </div>
                   </div>
@@ -525,6 +530,13 @@ const Products = () => {
         busy={bulk.isPending}
         collections={collections.data ?? []}
         onConfirm={(id) => bulk.mutate({ action: "set_collection", collection_id: id })}
+      />
+      <BulkDiscountDialog
+        open={dialog === "discount"}
+        onOpenChange={(o) => !o && setDialog(null)}
+        count={count}
+        busy={bulk.isPending}
+        onConfirm={(value) => bulk.mutate({ action: "set_discount", value })}
       />
       <BulkStockDialog open={dialog === "stock"} onOpenChange={(o) => !o && setDialog(null)} count={count} busy={bulk.isPending} onConfirm={(value) => bulk.mutate({ action: "set_stock", value })} />
       <ConfirmDialog

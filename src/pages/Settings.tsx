@@ -65,6 +65,15 @@ const SECTIONS: { title: string; description: string; fields: FieldDef[] }[] = [
     description:
       "Títulos das seções de peças. O texto pequeno aparece acima do título; deixe um campo vazio para ocultar aquela linha. Marque as peças em Peças → Destaque, Subdestaque ou Peça destaque.",
     fields: [
+      {
+        key: "announcement_bar",
+        label: "Faixa de avisos",
+        multiline: true,
+        rows: 3,
+        wide: true,
+        placeholder: "Frete grátis para todo o Brasil\nAnéis com 40% off\nParcele em até 10x sem juros",
+        hint: "Textos que rolam sem parar na faixa fina acima do cabeçalho, em todas as páginas. Um aviso por linha; deixe vazio para ocultar a faixa.",
+      },
       { key: "featured_eyebrow", label: "Destaques · texto pequeno", placeholder: "Seleção Oréa" },
       { key: "featured_title", label: "Destaques · título", placeholder: "Peças escolhidas uma a uma" },
       { key: "subfeatured_eyebrow", label: "Subdestaques · texto pequeno", placeholder: "Novidades" },

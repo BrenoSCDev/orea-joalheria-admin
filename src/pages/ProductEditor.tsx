@@ -23,7 +23,7 @@ import { ImageTile, useLocalPreviews } from "@/components/products/imageFiles";
 import { ProductStatusBadge } from "@/components/products/ProductStatusBadge";
 import { CategoryPicker } from "@/components/categories/CategoryPicker";
 import { inputToPrice, priceToInput } from "@/lib/price";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface FormState {
   name: string;
@@ -38,6 +38,7 @@ interface FormState {
   weight_grams: string;
   size: string;
   price: string;
+  promotional_price: string;
   stock_quantity: string;
   is_unique: boolean;
   is_active: boolean;
@@ -59,6 +60,7 @@ const EMPTY: FormState = {
   weight_grams: "",
   size: "",
   price: "",
+  promotional_price: "",
   stock_quantity: "1",
   is_unique: true,
   is_active: false,
@@ -80,6 +82,7 @@ const fromProduct = (p: Product): FormState => ({
   weight_grams: p.weight_grams ? String(Number(p.weight_grams)).replace(".", ",") : "",
   size: p.size ?? "",
   price: priceToInput(p.price),
+  promotional_price: priceToInput(p.promotional_price),
   stock_quantity: String(p.stock_quantity),
   is_unique: p.is_unique,
   is_active: p.is_active,
@@ -131,12 +134,27 @@ const ProductEditor = () => {
     if (errors[key]) setErrors(({ [key]: _, ...rest }) => rest);
   };
 
+  // "−40% · de R$ 10.000,00 por R$ 6.000,00" under the promotional price field.
+  const promoHint = (() => {
+    const price = inputToPrice(form.price);
+    const promo = inputToPrice(form.promotional_price);
+    if (price === null || Number.isNaN(price)) return "Defina o preço para poder aplicar um desconto.";
+    if (promo === null || Number.isNaN(promo) || promo >= price) return "No site, o preço aparece riscado e este passa a ser o valor da peça.";
+    return `${Math.round((1 - promo / price) * 100)}% de desconto · de ${formatPrice(price)} por ${formatPrice(promo)}`;
+  })();
+
   const buildPayload = (): ProductPayload | null => {
     const price = inputToPrice(form.price);
+    const promo = inputToPrice(form.promotional_price);
     const weight = form.weight_grams.trim() ? Number(form.weight_grams.replace(",", ".")) : null;
     const local: Record<string, string> = {};
     if (!form.name.trim()) local.name = "Informe o nome da peça.";
     if (price !== null && (Number.isNaN(price) || price < 0)) local.price = "Valor inválido. Ex.: 12.500,00";
+    if (promo !== null) {
+      if (Number.isNaN(promo) || promo < 0) local.promotional_price = "Valor inválido. Ex.: 9.900,00";
+      else if (price === null) local.promotional_price = "Informe o preço da peça para definir um preço promocional.";
+      else if (!Number.isNaN(price) && promo >= price) local.promotional_price = "O preço promocional deve ser menor que o preço.";
+    }
     if (weight !== null && (Number.isNaN(weight) || weight < 0)) local.weight_grams = "Peso inválido.";
     if (Object.keys(local).length) {
       setErrors(local);
@@ -156,6 +174,7 @@ const ProductEditor = () => {
       weight_grams: weight,
       size: nullable(form.size),
       price,
+      promotional_price: promo,
       stock_quantity: form.is_unique ? Math.min(1, Math.max(0, Number(form.stock_quantity) || 0)) : Math.max(0, Number(form.stock_quantity) || 0),
       is_unique: form.is_unique,
       is_active: form.is_active,
@@ -456,6 +475,25 @@ const ProductEditor = () => {
                     placeholder="Sob consulta"
                     className="pl-9 tabular-nums"
                     aria-invalid={!!errors.price}
+                  />
+                </div>
+              </Field>
+              <Field label="Preço promocional" htmlFor="promotional_price" optional error={errors.promotional_price} hint={promoHint}>
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">R$</span>
+                  <Input
+                    id="promotional_price"
+                    inputMode="decimal"
+                    value={form.promotional_price}
+                    onChange={(e) => set("promotional_price", e.target.value)}
+                    onBlur={() => {
+                      const v = inputToPrice(form.promotional_price);
+                      if (v !== null && !Number.isNaN(v)) set("promotional_price", priceToInput(v));
+                    }}
+                    placeholder="Sem desconto"
+                    disabled={!form.price.trim() && !form.promotional_price.trim()}
+                    className="pl-9 tabular-nums"
+                    aria-invalid={!!errors.promotional_price}
                   />
                 </div>
               </Field>

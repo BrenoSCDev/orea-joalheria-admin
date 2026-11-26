@@ -39,6 +39,7 @@ export interface ProductPayload {
   weight_grams?: number | string | null;
   size?: string | null;
   price?: number | string | null;
+  promotional_price?: number | string | null;
   stock_quantity?: number;
   is_unique?: boolean;
   is_active?: boolean;
@@ -116,6 +117,8 @@ export type BulkAction =
   | "subfeature"
   | "unsubfeature"
   | "set_stock"
+  | "set_discount"
+  | "clear_discount"
   | "mark_unique"
   | "unmark_unique"
   | "add_categories"
