@@ -1,0 +1,112 @@
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   Oréa admin tokens (HSL). Structure mirrors Optomyze Manager.
+   - primary (buttons) = brand grey #35333D: highest legibility
+   - brand (#01A77F) = identity accent: active nav icon, focus ring,
+     switches, progress, published status
+   - surfaces use a neutral tint of the brand off-white #EFEDE1
+   ───────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --background: 48 20% 98.4%;
+    --foreground: 252 9% 22%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 252 9% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 252 9% 22%;
+
+    --primary: 252 9% 22%;            /* #35333D */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 48 18% 94.5%;
+    --secondary-foreground: 252 9% 22%;
+    --muted: 48 16% 95.5%;
+    --muted-foreground: 252 5% 44%;
+    --accent: 48 18% 94%;
+    --accent-foreground: 252 9% 22%;
+
+    --brand: 165 99% 33%;             /* #01A77F */
+    --brand-deep: 163 98% 24%;        /* #017A5D, AA on white */
+    --brand-soft: 160 45% 94%;
+    --brand-aqua: 177 49% 50%;        /* #41BEB8 */
+
+    --success: 163 98% 24%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 160 45% 93%;
+    --warning: 32 85% 36%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 40 90% 93%;
+    --destructive: 0 68% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-light: 0 80% 96%;
+
+    --border: 48 12% 89%;
+    --input: 48 10% 85%;
+    --ring: 165 99% 33%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 50 24% 96.5%;
+    --sidebar-foreground: 252 9% 22%;
+    --sidebar-accent: 48 20% 92%;
+    --sidebar-border: 48 14% 88%;
+    --sidebar-ring: 165 99% 33%;
+
+    --shadow-card: 0 1px 2px 0 rgba(53, 51, 61, 0.05);
+    --shadow-hover: 0 8px 24px -6px rgba(53, 51, 61, 0.14);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background font-sans text-[14px] text-foreground antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-semibold tracking-tight;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+  }
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.2); border-radius: 3px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+
+  input[type="number"]::-webkit-inner-spin-button { opacity: 0.4; }
+}
+
+@layer components {
+  /* Card surface (same recipe as Optomyze "glass-card") */
+  .surface {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+  }
+  .surface-hover {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .surface-hover:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: hsl(var(--brand) / 0.35);
+  }
+  .transition-smooth {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer utilities {
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
