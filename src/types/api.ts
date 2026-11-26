@@ -98,7 +98,8 @@ export interface SiteSettings {
   opening_hours: string | null;
   instagram_url: string | null;
   facebook_url: string | null;
-  vip_group_url: string | null;
+  /** Message the customer sends to the store WhatsApp to join the VIP group. */
+  vip_whatsapp_message: string | null;
   cnpj: string | null;
   hero_title: string | null;
   hero_subtitle: string | null;

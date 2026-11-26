@@ -84,8 +84,19 @@ const SECTIONS: { title: string; description: string; fields: FieldDef[] }[] = [
   },
   {
     title: "Campanha Grupo VIP",
-    description: "Destino dos banners da campanha Black Oréa (carrossel e banner do Grupo VIP). Enquanto o link estiver vazio, os banners levam ao WhatsApp da loja.",
-    fields: [{ key: "vip_group_url", label: "Link do grupo", inputMode: "url", placeholder: "https://chat.whatsapp.com/…", wide: true }],
+    description:
+      "Ao clicar nos banners da Black Oréa (carrossel e banner do Grupo VIP), o cliente abre o WhatsApp da Oréa com esta mensagem pedindo para entrar no grupo. O link do grupo não fica público no site.",
+    fields: [
+      {
+        key: "vip_whatsapp_message",
+        label: "Mensagem para entrar no Grupo VIP",
+        multiline: true,
+        rows: 2,
+        wide: true,
+        placeholder: "Olá! Gostaria de entrar no Grupo VIP da Oréa para aproveitar a Black Oréa.",
+        hint: "Enviada para o número de WhatsApp configurado acima. Vazio = mensagem padrão.",
+      },
+    ],
   },
 ];
 
