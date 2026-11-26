@@ -16,3 +16,8 @@ dist-ssr
 
 .env
 .env.production
+
+# Deploy (configured in production, not versioned)
+Dockerfile
+.dockerignore
+nginx/
