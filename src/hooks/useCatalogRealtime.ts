@@ -30,6 +30,7 @@ export function useCatalogRealtime(): RealtimeStatus {
         product: ["products", "dashboard"],
         category: ["categories", "dashboard"],
         collection: ["collections", "dashboard"],
+        campaign: ["campaigns", "campaign", "products"],
         settings: ["settings"],
       };
       keys[event.entity]?.forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));

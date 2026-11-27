@@ -10,13 +10,19 @@ interface Props {
   value: number[];
   onChange: (ids: number[]) => void;
   loading?: boolean;
+  /** false = plain multi-select (no primary category), e.g. campaign rules. */
+  ordered?: boolean;
+  /** Ids that cannot be picked here (e.g. already used in the opposite list). */
+  disabledIds?: number[];
+  /** Chip style for the selected categories. */
+  tone?: "default" | "exclude";
 }
 
 /**
  * Multi-select over the category tree. Selected categories show as chips; the
  * first chip is the primary category (used for the breadcrumb and card label).
  */
-export const CategoryPicker = ({ categories, value, onChange, loading }: Props) => {
+export const CategoryPicker = ({ categories, value, onChange, loading, ordered = true, disabledIds = [], tone = "default" }: Props) => {
   const [query, setQuery] = useState("");
   const flat = useMemo(() => flattenTree(buildTree(categories)), [categories]);
   const byId = useMemo(() => new Map(flat.map((c) => [c.id, c])), [flat]);
@@ -39,11 +45,11 @@ export const CategoryPicker = ({ categories, value, onChange, loading }: Props) 
                 key={id}
                 className={cn(
                   "inline-flex max-w-full items-center gap-1 rounded-md border py-0.5 pl-2 pr-1 text-[12px]",
-                  i === 0 ? "border-brand/40 bg-brand-soft text-brand-deep" : "bg-muted/60",
+                  tone === "exclude" ? "border-destructive/25 bg-destructive-light text-destructive" : ordered && i === 0 ? "border-brand/40 bg-brand-soft text-brand-deep" : "bg-muted/60",
                 )}
                 title={c.path.join(" › ")}
               >
-                {i === 0 ? (
+                {!ordered ? null : i === 0 ? (
                   <Star className="h-3 w-3 shrink-0 fill-current" aria-label="Principal" />
                 ) : (
                   <button type="button" onClick={() => makePrimary(id)} className="shrink-0 text-muted-foreground hover:text-brand-deep" title="Tornar principal" aria-label={`Tornar ${c.name} a categoria principal`}>
@@ -78,18 +84,20 @@ export const CategoryPicker = ({ categories, value, onChange, loading }: Props) 
           )}
           {visible.map((c) => {
             const checked = value.includes(c.id);
+            const disabled = !checked && disabledIds.includes(c.id);
             return (
-              <li key={c.id} role="option" aria-selected={checked}>
+              <li key={c.id} role="option" aria-selected={checked} aria-disabled={disabled}>
                 <button
                   type="button"
                   onClick={() => toggle(c.id)}
-                  className="flex w-full items-center gap-2 py-1.5 pr-3 text-left text-[13px] transition-colors hover:bg-muted/60"
+                  disabled={disabled}
+                  className="flex w-full items-center gap-2 py-1.5 pr-3 text-left text-[13px] transition-colors hover:bg-muted/60 disabled:cursor-not-allowed disabled:opacity-40"
                   style={{ paddingLeft: q ? 12 : 12 + c.depth * 16 }}
                 >
                   <span
                     className={cn(
                       "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
-                      checked ? "border-brand-deep bg-brand-deep text-white" : "border-input bg-background",
+                      checked ? (tone === "exclude" ? "border-destructive bg-destructive text-white" : "border-brand-deep bg-brand-deep text-white") : "border-input bg-background",
                     )}
                   >
                     {checked && <Check className="h-3 w-3" />}
@@ -101,7 +109,7 @@ export const CategoryPicker = ({ categories, value, onChange, loading }: Props) 
           })}
         </ul>
       </div>
-      {value.length > 1 && <p className="text-[12px] text-muted-foreground">A categoria com estrela é a principal (usada no site). Filtrar pela categoria-mãe inclui as subcategorias.</p>}
+      {ordered && value.length > 1 && <p className="text-[12px] text-muted-foreground">A categoria com estrela é a principal (usada no site). Filtrar pela categoria-mãe inclui as subcategorias.</p>}
     </div>
   );
 };

@@ -47,6 +47,14 @@ export const endpoints = {
       images: (id: number) => `/admin/products/${id}/images`,
       image: (id: number, imageId: number) => `/admin/products/${id}/images/${imageId}`,
     },
+    campaigns: {
+      list: "/admin/campaigns",
+      create: "/admin/campaigns",
+      show: (id: number) => `/admin/campaigns/${id}`,
+      update: (id: number) => `/admin/campaigns/${id}`,
+      delete: (id: number) => `/admin/campaigns/${id}`,
+      preview: "/admin/campaigns/preview",
+    },
     settings: "/admin/settings",
   },
 };

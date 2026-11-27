@@ -13,6 +13,8 @@ import TaxonomyPage from "./pages/TaxonomyPage";
 import Categories from "./pages/Categories";
 import ProductImport from "./pages/ProductImport";
 import Settings from "./pages/Settings";
+import Campaigns from "./pages/Campaigns";
+import CampaignEditor from "./pages/CampaignEditor";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -41,6 +43,9 @@ const App = () => (
               <Route path="produtos/:id" element={<ProductEditor key="edit" />} />
               <Route path="categorias" element={<Categories />} />
               <Route path="colecoes" element={<TaxonomyPage key="collections" kind="collections" />} />
+              <Route path="campanhas" element={<Campaigns />} />
+              <Route path="campanhas/nova" element={<CampaignEditor />} />
+              <Route path="campanhas/:id" element={<CampaignEditor key="edit" />} />
               <Route path="configuracoes" element={<Settings />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

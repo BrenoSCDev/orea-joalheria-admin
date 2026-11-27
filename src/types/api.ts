@@ -84,6 +84,76 @@ export interface Product {
   collection: Pick<Collection, "id" | "name" | "slug"> | null;
   cover_image?: ProductImage | null;
   images?: ProductImage[];
+  /** Prices calculated by the API (list only): running campaign, else promotional price. */
+  pricing?: Pricing;
+}
+
+/* ── "Desconto Configurado Geral" ─────────────────────────── */
+
+export type PaymentType = "cash" | "installments";
+
+/** One payment condition as priced by the API for a piece. */
+export interface PricingOption {
+  payment_type: PaymentType;
+  max_installments: number;
+  discount_percent: number;
+  price: string;
+  installment_price: string;
+}
+
+export interface Pricing {
+  original_price: string | null;
+  /** Lowest price the customer can pay. */
+  price: string | null;
+  discount_percent: number;
+  source: "campaign" | "promotion" | null;
+  campaign: { id: number; name: string } | null;
+  options: PricingOption[];
+}
+
+export interface CampaignCondition {
+  id?: number;
+  payment_type: PaymentType;
+  max_installments: number;
+  discount_percent: number | string;
+}
+
+export interface CampaignProductRef {
+  id: number;
+  name: string;
+  sku: string | null;
+  price: string | null;
+  cover_url: string | null;
+}
+
+export type CampaignStatus = "active" | "scheduled" | "ended" | "inactive";
+
+export interface Campaign {
+  id: number;
+  name: string;
+  is_active: boolean;
+  applies_to_all: boolean;
+  /** true = replaces the pieces' own promotional price; false = those pieces stay out. */
+  override_product_promotions: boolean;
+  priority: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  status: CampaignStatus;
+  conditions: CampaignCondition[];
+  include_category_ids: number[];
+  exclude_category_ids: number[];
+  include_products: CampaignProductRef[];
+  exclude_products: CampaignProductRef[];
+  /** List only: published pieces that match the rules. */
+  eligible_count?: number;
+  updated_at: string;
+}
+
+export interface CampaignPreview {
+  eligible_count: number;
+  /** Eligible pieces taken by another running campaign with higher priority. */
+  overridden_count: number;
+  samples: (Pick<Product, "id" | "name" | "sku" | "price" | "promotional_price" | "cover_image"> & { pricing: Pricing })[];
 }
 
 export interface SiteSettings {
@@ -117,7 +187,7 @@ export type ProductToggle = Partial<Pick<Product, "is_active" | "is_featured" | 
 
 /** Payload of the "catalog.updated" event on the public "catalog" channel. */
 export interface CatalogUpdatedEvent {
-  entity: "product" | "category" | "collection" | "settings";
+  entity: "product" | "category" | "collection" | "campaign" | "settings";
   action: "created" | "updated" | "deleted";
   data: Record<string, unknown>;
 }

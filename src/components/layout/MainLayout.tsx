@@ -32,7 +32,7 @@ export function MainLayout() {
   const match = Object.keys(ROUTE_TITLES)
     .filter((p) => p === "/" ? path === "/" : path.startsWith(p))
     .sort((a, b) => b.length - a.length)[0];
-  const title = /^\/produtos\/\d+/.test(path) ? "Editar peça" : ROUTE_TITLES[match] ?? "Painel";
+  const title = /^\/produtos\/\d+/.test(path) ? "Editar peça" : /^\/campanhas\/\d+/.test(path) ? "Editar campanha" : ROUTE_TITLES[match] ?? "Painel";
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,6 +1,6 @@
 import { apiClient } from "./apiClient";
 import { endpoints } from "@/config/api";
-import { ApiResponse, Category, Collection, Paginated, Product, ProductImage, SiteSettings } from "@/types/api";
+import { ApiResponse, Campaign, CampaignCondition, CampaignPreview, Category, Collection, Paginated, Product, ProductImage, SiteSettings } from "@/types/api";
 
 export interface DashboardData {
   products: number;
@@ -58,6 +58,23 @@ export interface TaxonomyPayload {
   is_active?: boolean;
   is_featured?: boolean;
   image?: File | null;
+}
+
+/** Campaign form as sent to the API. */
+export interface CampaignPayload {
+  id?: number;
+  name: string;
+  is_active: boolean;
+  applies_to_all: boolean;
+  override_product_promotions: boolean;
+  priority: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  conditions: Omit<CampaignCondition, "id">[];
+  include_category_ids: number[];
+  exclude_category_ids: number[];
+  include_product_ids: number[];
+  exclude_product_ids: number[];
 }
 
 const unwrap = <T>(p: Promise<ApiResponse<T>>) => p.then((r) => r.data);
@@ -189,6 +206,15 @@ export const catalogService = {
   updateCollection: (id: number, data: TaxonomyPayload) =>
     unwrap(apiClient.post<ApiResponse<Collection>>(endpoints.admin.collections.update(id), taxonomyForm(data, "cover", "PUT"))),
   deleteCollection: (id: number) => apiClient.delete(endpoints.admin.collections.delete(id)),
+
+  // Campaigns ("Desconto Configurado Geral")
+  campaigns: () => unwrap(apiClient.get<ApiResponse<Campaign[]>>(endpoints.admin.campaigns.list)),
+  campaign: (id: number) => unwrap(apiClient.get<ApiResponse<Campaign>>(endpoints.admin.campaigns.show(id))),
+  createCampaign: (data: CampaignPayload) => unwrap(apiClient.post<ApiResponse<Campaign>>(endpoints.admin.campaigns.create, data)),
+  updateCampaign: (id: number, data: CampaignPayload) => unwrap(apiClient.put<ApiResponse<Campaign>>(endpoints.admin.campaigns.update(id), data)),
+  deleteCampaign: (id: number) => apiClient.delete(endpoints.admin.campaigns.delete(id)),
+  /** Simulates an unsaved form: matching pieces and example prices, calculated by the API. */
+  previewCampaign: (data: CampaignPayload) => unwrap(apiClient.post<ApiResponse<CampaignPreview>>(endpoints.admin.campaigns.preview, data)),
 
   // Institutional settings
   settings: () => unwrap(apiClient.get<ApiResponse<SiteSettings>>(endpoints.admin.settings)),
